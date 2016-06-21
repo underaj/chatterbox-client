@@ -10,42 +10,12 @@ $(document).ready(function() {
 
   $('.newroomname').hide();
 
-  $('.send').click(function() {
-    message.text = $('.new-message').val() || 'hi';
-    roomName = $('.newroomname').val() || roomName;
-    message.roomname = roomName;
-    $('.newroomname').val('');
-    $('.newroomname').hide();
-    $.ajax({
-      // This is the url you should use to communicate with the parse API server.
-      url: 'https://api.parse.com/1/classes/messages',
-      type: 'POST',
-      data: JSON.stringify(message),
-      contentType: 'application/json',
-      success: function (data) {
-        $('.new-message').val('');
-        populate(roomName);
-      },
-      error: function (data) {
-        // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
-        console.error('chatterbox: Failed to send message', data);
-      }
-    });
-  });
+  $('.newroom').click( () => $('.newroomname').show() );
 
-  $('.newroom').click(function() {
-    $('.newroomname').show();
-  });
+  $('.refresh').click( () => populate(roomName) );
 
-  $('.refresh').click(function() {
-    populate(roomName);
-  });
+  $('.dropbtn').click( () => $('#myDropdown').toggleClass('show') );
 
-  $('.dropbtn').click(function() {
-    $('#myDropdown').toggleClass('show');
-  });
-
-  // Close the dropdown menu if the user clicks outside of it
   window.onclick = function(event) {
     if (!event.target.matches('.dropbtn')) {
       var dropdowns = $('.dropdown-content');
@@ -65,13 +35,34 @@ $(document).ready(function() {
   });
 
   $(document).on('click', '.user', function() {
-    $('.' + $(this).attr('class').split(' ')[0]).toggleClass('buddy');
+    $('.' + $(this).attr('class').split(' ')[0]).toggleClass('buddy'); 
+  });
+
+  $('.send').click(function() {
+    message.text = $('.new-message').val() || 'hi';
+    roomName = $('.newroomname').val() || roomName;
+    message.roomname = roomName;
+    $('.newroomname').val('');
+    $('.newroomname').hide();
+    $.ajax({
+      url: 'https://api.parse.com/1/classes/messages',
+      type: 'POST',
+      data: JSON.stringify(message),
+      contentType: 'application/json',
+      success: (data) => {
+        $('.new-message').val('');
+        populate(roomName);
+      },
+      error: (data) => console.error('chatterbox: Failed to send message', data)
+    });
   });
 
   var appendMessages = function (results) {
     _.each(results, function(element) {
       if (roomNames.indexOf(element.roomname) === -1 && element.roomname !== null && element.roomname !== undefined) {
-        $('.chatroom').append($('<a class=\"room\" href="#">' + element.roomname + '</a>'));
+        var r = $('<a class=\"room\" href="#"></a>');
+        r.text(element.roomname);
+        $('.chatroom').append(r);
         roomNames.push(element.roomname);
       }
 
@@ -89,16 +80,13 @@ $(document).ready(function() {
       // This is the url you should use to communicate with the parse API server.
       url: 'https://api.parse.com/1/classes/messages',
       type: 'GET',
-      success: function (data) {                
+      success: data => {                
         $('#chats').empty();
         roomName = name || data.results[0].roomname;
         $('.dropbtn').text(roomName);
         appendMessages(data.results);
       },
-      error: function (data) {
-        // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
-        console.error('chatterbox: Failed to get message', data);
-      }
+      error: data => console.error('chatterbox: Failed to get message', data)
     });
   };
 
