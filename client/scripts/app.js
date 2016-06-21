@@ -1,18 +1,74 @@
 // YOUR CODE HERE:
 $(document).ready(function() {
-  var roomName;
-  var roomNames = [];
-  var message = {
-    username: window.location.search.split('=')[1],
-    text: $('.new-message').val(),
-    roomname: roomName
+  var app = {};
+  var appendMessages = function (results) {
+    _.each(results, function(element) {
+      if (app.roomNames.indexOf(element.roomname) === -1 && element.roomname !== null && element.roomname !== undefined) {
+        var r = $('<a class=\"room\" href="#"></a>');
+        r.text(element.roomname);
+        $('.chatroom').append(r);
+        app.roomNames.push(element.roomname);
+      }
+
+      if (element.roomname === app.roomName) {
+        var p = $('<p></p>');
+        p.addClass(element.username.replace(/\s/g, '') + ' user');
+        p.text(element.username + ': ' + element.text);
+        $('#chats').append(p);
+      }
+    });
+  };
+
+  app.init = function() {
+    app.roomName = 'lobby';
+    app.roomNames = [];
+    app.message = {
+      username: window.location.search.split('=')[1] || 'anonymous',
+      text: $('.new-message').val(),
+      roomname: app.roomName
+    };
+    app.fetch(app.roomName);
+  };
+
+  app.send = function() {
+    app.message.text = $('.new-message').val() || 'hi';
+    app.roomName = $('.newroomname').val() || app.roomName;
+    app.message.roomname = app.roomName;
+    $('.newroomname').val('');
+    $('.newroomname').hide();
+    $.ajax({
+      url: 'https://api.parse.com/1/classes/messages',
+      type: 'POST',
+      data: JSON.stringify(app.message),
+      contentType: 'application/json',
+      success: (data) => {
+        $('.new-message').val('');
+        app.fetch(app.roomName);
+      },
+      error: (data) => console.error('chatterbox: Failed to send message', data)
+    });
+  };
+
+  app.fetch = function(name) {
+    $.ajax({
+      // This is the url you should use to communicate with the parse API server.
+      url: 'https://api.parse.com/1/classes/messages',
+      type: 'GET',
+      success: data => {                
+        $('#chats').empty();
+        app.roomName = name;
+        $('.dropbtn').text(app.roomName);
+        appendMessages(data.results);
+      },
+      error: data => console.error('chatterbox: Failed to get message', data)
+    });
   };
 
   $('.newroomname').hide();
 
   $('.newroom').click( () => $('.newroomname').show() );
 
-  $('.refresh').click( () => populate(roomName) );
+  $('.refresh').click( () => app.fetch(app.roomName) );
 
   $('.dropbtn').click( () => $('#myDropdown').toggleClass('show') );
 
@@ -31,7 +87,7 @@ $(document).ready(function() {
 
   $(document).on('click', '.room', function() {
     var name = $(this).html();
-    populate(name);
+    app.fetch(name);
   });
 
   $(document).on('click', '.user', function() {
@@ -39,56 +95,13 @@ $(document).ready(function() {
   });
 
   $('.send').click(function() {
-    message.text = $('.new-message').val() || 'hi';
-    roomName = $('.newroomname').val() || roomName;
-    message.roomname = roomName;
-    $('.newroomname').val('');
-    $('.newroomname').hide();
-    $.ajax({
-      url: 'https://api.parse.com/1/classes/messages',
-      type: 'POST',
-      data: JSON.stringify(message),
-      contentType: 'application/json',
-      success: (data) => {
-        $('.new-message').val('');
-        populate(roomName);
-      },
-      error: (data) => console.error('chatterbox: Failed to send message', data)
-    });
+    app.send();
   });
 
-  var appendMessages = function (results) {
-    _.each(results, function(element) {
-      if (roomNames.indexOf(element.roomname) === -1 && element.roomname !== null && element.roomname !== undefined) {
-        var r = $('<a class=\"room\" href="#"></a>');
-        r.text(element.roomname);
-        $('.chatroom').append(r);
-        roomNames.push(element.roomname);
-      }
-
-      if (element.roomname === roomName) {
-        var p = $('<p></p>');
-        p.addClass(element.username.replace(/\s/g, '') + ' user');
-        p.text(element.username + ': ' + element.text);
-        $('#chats').append(p);
-      }
-    });
-  };
-  
-  var populate = function(name) {
-    $.ajax({
-      // This is the url you should use to communicate with the parse API server.
-      url: 'https://api.parse.com/1/classes/messages',
-      type: 'GET',
-      success: data => {                
-        $('#chats').empty();
-        roomName = name || data.results[0].roomname;
-        $('.dropbtn').text(roomName);
-        appendMessages(data.results);
-      },
-      error: data => console.error('chatterbox: Failed to get message', data)
-    });
-  };
-
-  populate();
+  app.init();
 });
+
+
+
+
+
