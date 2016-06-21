@@ -18,7 +18,6 @@ $(document).ready(function() {
     $('.newroomname').hide();
     $.ajax({
       // This is the url you should use to communicate with the parse API server.
-      // console.log('here');
       url: 'https://api.parse.com/1/classes/messages',
       type: 'POST',
       data: JSON.stringify(message),
@@ -66,7 +65,6 @@ $(document).ready(function() {
   });
 
   $(document).on('click', '.user', function() {
-    console.log($(this).attr('class'));
     $('.' + $(this).attr('class').split(' ')[0]).toggleClass('buddy');
   });
 
