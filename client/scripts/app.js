@@ -1,6 +1,6 @@
 // YOUR CODE HERE:
 $(document).ready(function() {
-  var roomName;
+var roomName;
   var roomNames = [];
   var message = {
     username: window.location.search.split('=')[1],
@@ -66,12 +66,12 @@ $(document).ready(function() {
   });
 
   $(document).on('click', '.user', function() {
-    
+
   });
 
   var appendMessages = function (results) {
     _.each(results, function(element) {
-      if (roomNames.indexOf(element.roomname) === -1) {
+      if (roomNames.indexOf(element.roomname) === -1 && element.roomname !== null && element.roomname !== undefined) {
         $('.chatroom').append($('<a class=\"room\" href="#">' + element.roomname + '</a>'));
         roomNames.push(element.roomname);
       }
