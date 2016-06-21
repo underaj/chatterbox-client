@@ -4,12 +4,18 @@ $(document).ready(function() {
   var roomNames = [];
   var message = {
     username: window.location.search.split('=')[1],
-    text: $('input').val(),
-    roomname: 'all'
+    text: $('.new-message').val(),
+    roomname: roomName
   };
 
+  $('.newroomname').hide();
+
   $('.send').click(function() {
-    message.text = $('input').val() || 'hi';
+    message.text = $('.new-message').val() || 'hi';
+    roomName = $('.newroomname').val() || roomName;
+    message.roomname = roomName;
+    $('.newroomname').val('');
+    $('.newroomname').hide();
     $.ajax({
       // This is the url you should use to communicate with the parse API server.
       // console.log('here');
@@ -18,8 +24,8 @@ $(document).ready(function() {
       data: JSON.stringify(message),
       contentType: 'application/json',
       success: function (data) {
-        console.log('chatterbox: Message sent');
-        // $('input').text() = '';
+        $('.new-message').val('');
+        populate(roomName);
       },
       error: function (data) {
         // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
@@ -28,19 +34,22 @@ $(document).ready(function() {
     });
   });
 
+  $('.newroom').click(function() {
+    $('.newroomname').show();
+  });
+
   $('.refresh').click(function() {
     populate(roomName);
   });
 
   $('.dropbtn').click(function() {
-    document.getElementById('myDropdown').classList.toggle('show');
+    $('#myDropdown').toggleClass('show');
   });
 
   // Close the dropdown menu if the user clicks outside of it
   window.onclick = function(event) {
     if (!event.target.matches('.dropbtn')) {
-
-      var dropdowns = document.getElementsByClassName('dropdown-content');
+      var dropdowns = $('.dropdown-content');
       var i;
       for (i = 0; i < dropdowns.length; i++) {
         var openDropdown = dropdowns[i];
@@ -65,7 +74,7 @@ $(document).ready(function() {
 
       if (element.roomname === roomName) {
         var p = $('<p></p>');
-        p.text(element.username + ':' + JSON.stringify(element.text));
+        p.text(element.username + ': ' + element.text);
         $('#chats').append(p);
       }
     });
