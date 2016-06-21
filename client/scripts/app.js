@@ -65,6 +65,10 @@ $(document).ready(function() {
     populate(name);
   });
 
+  $(document).on('click', '.user', function() {
+    
+  });
+
   var appendMessages = function (results) {
     _.each(results, function(element) {
       if (roomNames.indexOf(element.roomname) === -1) {
@@ -74,6 +78,7 @@ $(document).ready(function() {
 
       if (element.roomname === roomName) {
         var p = $('<p></p>');
+        p.addClass(element.username + ' user');
         p.text(element.username + ': ' + element.text);
         $('#chats').append(p);
       }
