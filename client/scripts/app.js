@@ -1,6 +1,6 @@
 // YOUR CODE HERE:
 $(document).ready(function() {
-var roomName;
+  var roomName;
   var roomNames = [];
   var message = {
     username: window.location.search.split('=')[1],
@@ -66,7 +66,8 @@ var roomName;
   });
 
   $(document).on('click', '.user', function() {
-
+    console.log($(this).attr('class'));
+    $('.' + $(this).attr('class').split(' ')[0]).toggleClass('buddy');
   });
 
   var appendMessages = function (results) {
@@ -78,7 +79,7 @@ var roomName;
 
       if (element.roomname === roomName) {
         var p = $('<p></p>');
-        p.addClass(element.username + ' user');
+        p.addClass(element.username.replace(/\s/g, '') + ' user');
         p.text(element.username + ': ' + element.text);
         $('#chats').append(p);
       }
