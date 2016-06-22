@@ -12,8 +12,8 @@ $(document).ready(function() {
 
       if (element.roomname === app.roomName) {
         var p = $('<p></p>');
-        p.addClass(element.username.replace(/\s/g, '') + ' user');
-        p.text(element.username + ': ' + element.text);
+        p.addClass(`${element.username.replace(/\s/g, '')} chat`);
+        p.text(`${element.username}: ${element.text}`);
         $('#chats').append(p);
       }
     });
@@ -27,7 +27,41 @@ $(document).ready(function() {
       text: $('.new-message').val(),
       roomname: app.roomName
     };
+
     app.fetch(app.roomName);
+
+    $('.newroomname').hide();
+
+    $('.newroom').click( () => $('.newroomname').show() );
+
+    $('.refresh').click( () => app.fetch(app.roomName) );
+
+    $('.dropbtn').click( () => $('#myDropdown').toggleClass('show') );
+
+    window.onclick = function(event) {
+      if (!event.target.matches('.dropbtn')) {
+        let dropdowns = $('.dropdown-content');
+        for (let i = 0; i < dropdowns.length; i++) {
+          let openDropdown = dropdowns[i];
+          if (openDropdown.classList.contains('show')) {
+            openDropdown.classList.remove('show');
+          }
+        }
+      }
+    };
+
+    $(document).on('click', '.room', function() {
+      var name = $(this).html();
+      app.fetch(name);
+    });
+
+    $(document).on('click', '.chat', function() {
+      $(`.${$(this).attr('class').split(' ')[0]}`).toggleClass('buddy'); 
+    });
+
+    $('.send').click(function() {
+      app.send();
+    });
   };
 
   app.send = function() {
@@ -63,40 +97,6 @@ $(document).ready(function() {
       error: data => console.error('chatterbox: Failed to get message', data)
     });
   };
-
-  $('.newroomname').hide();
-
-  $('.newroom').click( () => $('.newroomname').show() );
-
-  $('.refresh').click( () => app.fetch(app.roomName) );
-
-  $('.dropbtn').click( () => $('#myDropdown').toggleClass('show') );
-
-  window.onclick = function(event) {
-    if (!event.target.matches('.dropbtn')) {
-      var dropdowns = $('.dropdown-content');
-      var i;
-      for (i = 0; i < dropdowns.length; i++) {
-        var openDropdown = dropdowns[i];
-        if (openDropdown.classList.contains('show')) {
-          openDropdown.classList.remove('show');
-        }
-      }
-    }
-  };
-
-  $(document).on('click', '.room', function() {
-    var name = $(this).html();
-    app.fetch(name);
-  });
-
-  $(document).on('click', '.user', function() {
-    $('.' + $(this).attr('class').split(' ')[0]).toggleClass('buddy'); 
-  });
-
-  $('.send').click(function() {
-    app.send();
-  });
 
   app.init();
 });
