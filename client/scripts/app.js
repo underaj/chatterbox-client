@@ -1,7 +1,8 @@
 // YOUR CODE HERE:
 $(document).ready(function() {
   var app = {};
-  var appendMessages = function (results) {
+  
+  app.appendMessages = function (results) {
     _.each(results, function(element) {
       if (app.roomNames.indexOf(element.roomname) === -1 && element.roomname !== null && element.roomname !== undefined) {
         var r = $('<a class=\"room\" href="#"></a>');
@@ -92,12 +93,12 @@ $(document).ready(function() {
         $('#chats').empty();
         app.roomName = name;
         $('.dropbtn').text(app.roomName);
-        appendMessages(data.results);
+        app.appendMessages(data.results);
       },
       error: data => console.error('chatterbox: Failed to get message', data)
     });
   };
-
+     
   app.init();
 });
 
